@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import java.util.List;
 import java.util.Set;
@@ -59,9 +60,9 @@ public class Swapper extends Item implements IEnergyContainerItem{
         setMaxStackSize(1);
         setMaxDamage(Integer.MAX_VALUE);
         MinecraftForge.EVENT_BUS.register(this);
-        GameRegistry.addShapedRecipe(new ItemStack(this), "bpa", " c ", " s ", 's', new ItemStack(Items.stick),
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(this), "bpa", " c ", " s ", 's', Items.stick,
                 'b', new ItemStack(Items.stone_shovel), 'p', new ItemStack(Items.stone_pickaxe),
-                'a', new ItemStack(Items.stone_axe), 'c', new ItemStack(Item.getItemFromBlock(Blocks.chest)));
+                'a', new ItemStack(Items.stone_axe), 'c', new ItemStack(Item.getItemFromBlock(Blocks.chest))));
     }
 //region inventory stuff
     public static ItemStack getLastStack(ItemStack swapper){
