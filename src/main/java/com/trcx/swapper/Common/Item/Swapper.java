@@ -7,6 +7,8 @@ import com.trcx.swapper.Main;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -435,6 +437,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
 //endregion
 
 //region icons/rendering
+    @SideOnly(Side.CLIENT)
     @Override
     public FontRenderer getFontRenderer(ItemStack swapper) {
         ItemStack is = getLastStack(swapper);
@@ -446,6 +449,8 @@ public class Swapper extends Item implements IEnergyContainerItem{
         return super.getFontRenderer(swapper);
     }
 
+
+    @SideOnly(Side.CLIENT)
     @Override
     public int getColorFromItemStack(ItemStack swapper, int pass) {
         ItemStack is = getLastStack(swapper);
@@ -458,6 +463,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
         return super.getColorFromItemStack(swapper, pass);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override //called when rendering in inventory/hotbar
     public IIcon getIcon(ItemStack swapper, int renderPass) {
         ItemStack is = getLastStack(swapper);
@@ -481,12 +487,14 @@ public class Swapper extends Item implements IEnergyContainerItem{
         return ret;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void registerIcons(IIconRegister register) {
         super.registerIcons(register);
         outlineIcon = register.registerIcon("swapper:Swapper");
     }
 
+    @SideOnly(Side.CLIENT)
     @Override //called when held
     public IIcon getIcon(ItemStack swapper, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
         ItemStack is = getLastStack(swapper);
@@ -506,6 +514,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
         return ret;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public IIcon getIconIndex(ItemStack swapper) {
         ItemStack is = getLastStack(swapper);
@@ -517,11 +526,14 @@ public class Swapper extends Item implements IEnergyContainerItem{
         return outlineIcon;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public boolean requiresMultipleRenderPasses() {
         return true;
     }
 
+
+    @SideOnly(Side.CLIENT)
     @Override
     public int getRenderPasses(int metadata) {
         return 8;
