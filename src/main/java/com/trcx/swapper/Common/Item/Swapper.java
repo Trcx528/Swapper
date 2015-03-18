@@ -297,8 +297,10 @@ public class Swapper extends Item implements IEnergyContainerItem{
     public ItemStack onItemRightClick(ItemStack swapper, World world, EntityPlayer player) {
         if (player.isSneaking()) {
             if (!world.isRemote)
-                if (swapper.stackTagCompound.hasKey("ench"))
-                    swapper.stackTagCompound.removeTag("ench");
+                if (swapper!=null && swapper.hasTagCompound()) {
+                    if (swapper.stackTagCompound.hasKey("ench"))
+                        swapper.stackTagCompound.removeTag("ench");
+                }
                 player.openGui(Main.instance, 0, world, 0, 0, 0);
         } else {
             ItemStack is = getStack(slotRightClick, swapper);
