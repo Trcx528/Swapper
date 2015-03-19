@@ -107,8 +107,15 @@ public class Swapper extends Item implements IEnergyContainerItem{
     public static void putLastStack(ItemStack swapper, ItemStack is){
         ItemInventory inv = new ItemInventory(swapper,swapperSlots);
         int slot = swapper.stackTagCompound.getInteger(stringLASTTOOL);
-        if (is.stackSize > 0) {
-            inv.setInventorySlotContents(slot, is);
+        ItemStack currentIs = getLastStack(swapper);
+        if (is != null) {
+            if (is.stackSize > 0) {
+                if (is.getItem() == currentIs.getItem()) {
+                    inv.setInventorySlotContents(slot, is);
+                } // else don't do anything as this would probably dupe is
+            } else {
+                inv.setInventorySlotContents(slot, null);
+            }
         } else {
             inv.setInventorySlotContents(slot, null);
         }
