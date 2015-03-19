@@ -19,9 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -39,7 +37,6 @@ import java.util.Set;
 */
 
 //TODO funny rendering with itemBlock
-//TODO recipe
 
 @Optional.Interface(iface = "cofh.api.energy.IEnergyContainerItem", modid = "ITA")
 public class Swapper extends Item implements IEnergyContainerItem{
@@ -62,6 +59,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
         testTools.put("pickaxe", new ItemStack(Items.wooden_pickaxe));
         testTools.put("shovel", new ItemStack(Items.wooden_shovel));
         testTools.put("axe", new ItemStack(Items.wooden_axe));
+        testTools.put("sword", new ItemStack(Items.wooden_sword));
     }
 
     public Swapper(){
@@ -76,17 +74,19 @@ public class Swapper extends Item implements IEnergyContainerItem{
     }
 //region inventory stuff
     public static ItemStack getLastStack(ItemStack swapper){
-        if (swapper.hasTagCompound()){
-            int slot = swapper.stackTagCompound.getInteger(stringLASTTOOL);
-            return getStack(slot, swapper);
+        if (!swapper.hasTagCompound()){
+            swapper.stackTagCompound = new NBTTagCompound();
         }
-        return null;
+        int slot = swapper.stackTagCompound.getInteger(stringLASTTOOL);
+        return getStack(slot, swapper);
     }
 
     public static ItemStack getStack(int slot, ItemStack swapper){
         ItemInventory inv = new ItemInventory(swapper, swapperSlots);
         if (!swapper.hasTagCompound())
             swapper.stackTagCompound = new NBTTagCompound();
+        if (swapper.stackTagCompound.hasKey("swung"))
+            slot = slotSword;
         swapper.stackTagCompound.setInteger(stringLASTTOOL, slot);
         if (inv.getStackInSlot(slot) != null && inv.getStackInSlot(slot).getItem() == Main.Swapper)
             return null;
@@ -132,6 +132,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
 
     @Override
     public float getDigSpeed(ItemStack swapper, Block block, int metadata) {
+
         String effTool = block.getHarvestTool(metadata);
         ItemStack is;
         if (effTool == null){
@@ -155,7 +156,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
             } else {
                 is = getStack(slotPICK, swapper);
             }
-        } else { // have to handle vanilla not properly registering some blocks...
+        } else {
             if (block == Blocks.web) {
                 is = getStack(slotSword, swapper);
             } else {
@@ -211,6 +212,8 @@ public class Swapper extends Item implements IEnergyContainerItem{
     public boolean onEntitySwing(EntityLivingBase player, ItemStack swapper) {
         ItemStack is = getLastStack(swapper);
         if(is != null) {
+            if (swapper.stackTagCompound.hasKey("swung") && swapper.stackTagCompound.getInteger(stringLASTTOOL) == slotSword)
+                swapper.stackTagCompound.setInteger("swung",0);
             boolean ret = is.getItem().onEntitySwing(player, is);
             putLastStack(swapper,is);
             return ret;
@@ -221,6 +224,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
     @Override
     public boolean onLeftClickEntity(ItemStack swapper, EntityPlayer player, Entity mob) {
         ItemStack is = getStack(slotSword,swapper);
+        swapper.stackTagCompound.setInteger("swung",0);
         if(is != null) {
             boolean ret = is.getItem().onLeftClickEntity(is, player, mob);
             putLastStack(swapper,is);
@@ -232,6 +236,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
     @Override
     public boolean itemInteractionForEntity(ItemStack swapper, EntityPlayer player, EntityLivingBase mob) {
         ItemStack is = getStack(slotSword,swapper);
+        swapper.stackTagCompound.setInteger("swung",0);
         if(is != null) {
             boolean ret = is.getItem().itemInteractionForEntity(is, player, mob);
             putLastStack(swapper,is);
@@ -243,6 +248,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
     @Override
     public boolean hitEntity(ItemStack swapper, EntityLivingBase mob, EntityLivingBase player) {
         ItemStack is = getStack(slotSword,swapper);
+        swapper.stackTagCompound.setInteger("swung",0);
         if (is != null) {
             boolean ret = is.getItem().hitEntity(is, mob, player);
             putLastStack(swapper,is);
@@ -563,6 +569,16 @@ public class Swapper extends Item implements IEnergyContainerItem{
 
     @Override
     public void onUpdate(ItemStack swapper, World world, Entity player, int par4, boolean par5) {
+        if (swapper.hasTagCompound()) {
+            if (swapper.stackTagCompound.hasKey("swung")){
+                int swingTime = swapper.stackTagCompound.getInteger("swung");
+                if (swingTime >= 4){
+                    swapper.stackTagCompound.removeTag("swung");
+                } else {
+                    swapper.stackTagCompound.setInteger("swung",swingTime + 1);
+                }
+            }
+        }
         ItemStack is = getLastStack(swapper);
         if (is != null) {
             is.getItem().onUpdate(is, world, player, par4, par5);
