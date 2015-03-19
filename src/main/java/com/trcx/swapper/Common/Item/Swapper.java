@@ -29,7 +29,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,6 +55,14 @@ public class Swapper extends Item implements IEnergyContainerItem{
     private static final int slotRightClick = 4;
 
     public static final int swapperSlots = 5;
+
+    private static final HashMap<String, ItemStack> testTools = new HashMap<String, ItemStack>();
+    static
+    {
+        testTools.put("pickaxe", new ItemStack(Items.wooden_pickaxe));
+        testTools.put("shovel", new ItemStack(Items.wooden_shovel));
+        testTools.put("axe", new ItemStack(Items.wooden_axe));
+    }
 
     public Swapper(){
         super();
@@ -124,6 +134,17 @@ public class Swapper extends Item implements IEnergyContainerItem{
     public float getDigSpeed(ItemStack swapper, Block block, int metadata) {
         String effTool = block.getHarvestTool(metadata);
         ItemStack is;
+        if (effTool == null){
+            for (Map.Entry<String, ItemStack> testToolEntry : testTools.entrySet())
+            {
+                ItemStack testTool = testToolEntry.getValue();
+                if (testTool != null && testTool.getItem() instanceof ItemTool && testTool.func_150997_a(block) >= ((ItemTool) testTool.getItem()).func_150913_i().getEfficiencyOnProperMaterial())
+                {
+                    effTool = testToolEntry.getKey();
+                    break;
+                }
+            }
+        }
         if (effTool != null) {
             if (effTool.equals("shovel")) {
                 is = getStack(slotSHOVEL, swapper);
@@ -137,8 +158,6 @@ public class Swapper extends Item implements IEnergyContainerItem{
         } else { // have to handle vanilla not properly registering some blocks...
             if (block == Blocks.web) {
                 is = getStack(slotSword, swapper);
-            } else if (block == Blocks.wooden_door || block == Blocks.trapdoor || block == Blocks.ladder || block == Blocks.fence || block == Blocks.fence_gate) {
-                is = getStack(slotAXE, swapper);
             } else {
                 is = getStack(slotPICK, swapper);
             }
@@ -153,16 +172,7 @@ public class Swapper extends Item implements IEnergyContainerItem{
 
     @Override
     public int getHarvestLevel(ItemStack swapper, String toolClass) {
-        ItemStack is;
-        if (toolClass.equals("shovel")){
-            is = getStack(slotSHOVEL,swapper);
-        } else if (toolClass.equals("axe")) {
-            is = getStack(slotAXE, swapper);
-        } else if (toolClass.equals("sword")) {
-            is = getStack(slotSword, swapper);
-        } else {
-            is = getStack(slotPICK, swapper);
-        }
+        ItemStack is = getLastStack(swapper);
         if (is != null) {
             int ret = is.getItem().getHarvestLevel(is, toolClass);
             putLastStack(swapper,is);
