@@ -110,7 +110,9 @@ public class Swapper extends Item implements IEnergyContainerItem{
         ItemStack currentIs = getLastStack(swapper);
         if (is != null) {
             if (is.stackSize > 0) {
-                if (is.getItem() == currentIs.getItem() || currentIs.getItem().getContainerItem() == is.getItem()) {
+                if (is.getItem() == currentIs.getItem() ||
+                        currentIs.getItem().getContainerItem() == is.getItem() ||
+                        is.getItem().getContainerItem() == currentIs.getItem()) {
                     inv.setInventorySlotContents(slot, is);
                 } // else don't save, it'd probably dupe is
             } else {
