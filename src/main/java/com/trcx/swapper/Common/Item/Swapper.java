@@ -110,9 +110,9 @@ public class Swapper extends Item implements IEnergyContainerItem{
         ItemStack currentIs = getLastStack(swapper);
         if (is != null) {
             if (is.stackSize > 0) {
-                if (is.getItem() == currentIs.getItem()) {
+                if (is.getItem() == currentIs.getItem() || currentIs.getItem().getContainerItem() == is.getItem()) {
                     inv.setInventorySlotContents(slot, is);
-                } // else don't do anything as this would probably dupe is
+                } // else don't save, it'd probably dupe is
             } else {
                 inv.setInventorySlotContents(slot, null);
             }
@@ -498,9 +498,8 @@ public class Swapper extends Item implements IEnergyContainerItem{
             if (is.getItem() instanceof ItemBlock) {
                 ret = is.getItem().getIconFromDamage(is.getItemDamage());
             } else {
-                if (is.getItem().requiresMultipleRenderPasses()) {
-                    ret = is.getItem().getIcon(is, renderPass - 1);
-                } else {
+                ret = is.getItem().getIcon(is, renderPass - 1);
+                if (ret == null ){
                     ret = is.getItem().getIconIndex(is);
                 }
             }
@@ -522,9 +521,9 @@ public class Swapper extends Item implements IEnergyContainerItem{
     @Override //called when held
     public IIcon getIcon(ItemStack swapper, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
         ItemStack is = getLastStack(swapper);
-        IIcon ret = null;
+        IIcon ret;
         if (renderPass == 0)
-            return ret;
+            return null;
         if (is != null) {
             if (is.getItem() instanceof ItemBlock) {
                 ret = is.getItem().getIconFromDamage(is.getItemDamage());
