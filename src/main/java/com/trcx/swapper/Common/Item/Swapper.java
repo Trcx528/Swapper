@@ -87,15 +87,21 @@ public class Swapper extends Item implements IEnergyContainerItem{
             swapper.stackTagCompound = new NBTTagCompound();
         if (swapper.stackTagCompound.hasKey("swung"))
             slot = slotSword;
+        int prevSlot = 0;
+        if (swapper.stackTagCompound.hasKey(stringLASTTOOL))
+            prevSlot = swapper.stackTagCompound.getInteger(stringLASTTOOL);
         swapper.stackTagCompound.setInteger(stringLASTTOOL, slot);
         if (inv.getStackInSlot(slot) != null && inv.getStackInSlot(slot).getItem() == Main.Swapper)
             return null;
-        if (swapper.stackTagCompound.hasKey("ench")){
-            swapper.stackTagCompound.removeTag("ench");
-        }
         ItemStack returnStack = inv.getStackInSlot(slot);
         if (returnStack == null)
             return null;
+        if (swapper.stackTagCompound.hasKey("ench")){
+            if (inv.getStackInSlot(prevSlot) != null && inv.getStackInSlot(prevSlot).hasTagCompound()) {
+                inv.getStackInSlot(prevSlot).stackTagCompound.setTag("ench", swapper.stackTagCompound.getTag("ench"));
+            }
+            swapper.stackTagCompound.removeTag("ench");
+        }
         if (slot != slotRightClick){
             if (returnStack.hasTagCompound() && returnStack.stackTagCompound.hasKey("ench")) {
                 swapper.stackTagCompound.setTag("ench", returnStack.stackTagCompound.getTag("ench"));
@@ -326,8 +332,13 @@ public class Swapper extends Item implements IEnergyContainerItem{
         if (player.isSneaking()) {
             if (!world.isRemote)
                 if (swapper!=null && swapper.hasTagCompound()) {
-                    if (swapper.stackTagCompound.hasKey("ench"))
+                    ItemStack is = getLastStack(swapper);
+                    if (swapper.stackTagCompound.hasKey("ench")) {
+                        if (is != null && is.hasTagCompound()) {
+                            is.stackTagCompound.setTag("ench", swapper.stackTagCompound.getTag("ench"));
+                        }
                         swapper.stackTagCompound.removeTag("ench");
+                    }
                 }
                 player.openGui(Main.instance, 0, world, 0, 0, 0);
         } else {
