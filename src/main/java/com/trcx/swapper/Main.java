@@ -13,6 +13,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class Main
     public static final String VERSION = "1.0.4";
 
     public static Item Swapper;
+    public static Block SpeedTester;
     public static String[] swapperBlacklist = new String[2];
 
 
@@ -47,6 +49,10 @@ public class Main
 
         Swapper = new Swapper().setUnlocalizedName("Swapper").setTextureName("swapper:Swapper");
         GameRegistry.registerItem(Swapper, "swapper");
+
+        SpeedTester = new BlockSpeedTester();
+        GameRegistry.registerBlock(SpeedTester, "SpeedTester");
+
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
 
     }

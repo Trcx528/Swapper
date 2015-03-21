@@ -2,6 +2,7 @@ package com.trcx.swapper.Common.Item;
 
 import cofh.api.energy.IEnergyContainerItem;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.trcx.swapper.Common.OpenMods.ItemInventory;
 import com.trcx.swapper.Main;
 import cpw.mods.fml.common.Optional;
@@ -39,7 +40,7 @@ import java.util.Set;
 //TODO funny rendering with itemBlock
 
 @Optional.Interface(iface = "cofh.api.energy.IEnergyContainerItem", modid = "ITA")
-public class Swapper extends Item implements IEnergyContainerItem{
+public class Swapper extends ItemTool implements IEnergyContainerItem{
 
     private static final String stringLASTTOOL = "LastTool";
 
@@ -62,8 +63,10 @@ public class Swapper extends Item implements IEnergyContainerItem{
         testTools.put("sword", new ItemStack(Items.wooden_sword));
     }
 
+    private static final Set field_150915_c = Sets.newHashSet(new Block[]{Blocks.cobblestone, Blocks.double_stone_slab, Blocks.stone_slab, Blocks.stone, Blocks.sandstone, Blocks.mossy_cobblestone, Blocks.iron_ore, Blocks.iron_block, Blocks.coal_ore, Blocks.gold_block, Blocks.gold_ore, Blocks.diamond_ore, Blocks.diamond_block, Blocks.ice, Blocks.netherrack, Blocks.lapis_ore, Blocks.lapis_block, Blocks.redstone_ore, Blocks.lit_redstone_ore, Blocks.rail, Blocks.detector_rail, Blocks.golden_rail, Blocks.activator_rail});
+
     public Swapper(){
-        super();
+        super(0.0F,ToolMaterial.IRON, field_150915_c);
         setCreativeTab(CreativeTabs.tabTools);
         setMaxStackSize(1);
         setMaxDamage(Integer.MAX_VALUE);
@@ -147,7 +150,6 @@ public class Swapper extends Item implements IEnergyContainerItem{
 
     @Override
     public float getDigSpeed(ItemStack swapper, Block block, int metadata) {
-
         String effTool = block.getHarvestTool(metadata);
         ItemStack is;
         if (effTool == null){
@@ -322,7 +324,6 @@ public class Swapper extends Item implements IEnergyContainerItem{
         if (is != null) {
             ItemStack ret = is.getItem().onEaten(is, world, player);
             putLastStack(swapper,is);
-            return ret;//not sure which stack this should return honestly...
         }
         return super.onEaten(swapper, world, player);
     }
